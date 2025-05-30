@@ -1,21 +1,34 @@
-# Build An Alexa Skill with the Audio Player Interface (Node.js)
+# Music Assistant Alexa Skill
 
-This Alexa sample skill is a template for using the AudioPlayer interface for Alexa-hosted skills.
-Note that as this code is set up so that you can directly import this skill into your hosted skill.
-Check out the Documentation below for links on how to import this skill directly from the Alexa
-developer console.
+This project is an Alexa skill that integrates with [Music Assistant](https://music-assistant.io/) to provide audio playback using the AudioPlayer interface. The skill fetches the latest stream URL from your Music Assistant instance and plays it on Alexa-enabled devices.
+
+## Features
+
+- Voice control for starting, pausing, and resuming playback of your Music Assistant audio stream.
+- Uses the AudioPlayer interface for seamless background playback.
+- Customizable to your own Music Assistant server and API.
 
 ## Skill Architecture
-The skill consists of an inteface model and logic of the skill. This sample contains a sample skill that plays a single audio stream,
+The skill consists of an inteface model and logic of the skill. This skill plays a single audio stream,
 along with handlers for all of the AudioPlayer events, touch controls and error handling.
-The skill also uses DynamoDB to keep track of current playback information.
-
-## Additional Resources
 
 ### Documentation
-* [AudioPlayer Interface](https://developer.amazon.com/docs/alexa/custom-skills/audioplayer-interface-reference.html)
-* [Audio stream/file requirements](https://developer.amazon.com/docs/alexa/custom-skills/audioplayer-interface-reference.html#audio-stream-requirements)
-* [Import a skill from a Git repository](https://developer.amazon.com/docs/alexa/hosted-skills/alexa-hosted-skills-git-import.html)
+#### Importing the Skill from a Git Repository
 
-### Other Samples
-* [Previous AudioPlayer samples (ASK CLI v1, ASK SDK v1)](https://github.com/alexa/skill-sample-nodejs-audio-player/releases)
+You can import this skill into the Alexa Developer Console using the Git repository:
+
+1. Go to the [Alexa Developer Console](https://developer.amazon.com/alexa/console/ask).
+2. Click **Create Skill**.
+3. Enter a skill name and choose your default language.
+4. Select **Music & Audio** as the experience, **Custom** as the model, and **Alexa-Hosted (Node.js)** as the hosting service.
+5. Click **Import skill** and enter **https://github.com/alams154/music-assistant-alexa-skill.git**.
+6. Wait for the import process to complete. The code and resources from the repository will be available in your skill project.
+
+For more details, see the [official documentation](https://developer.amazon.com/docs/alexa/hosted-skills/alexa-hosted-skills-git-import.html).
+
+#### Customize and Build the Skill
+
+1. Go to the **Build** tab in the Alexa Developer Console.
+2. Click the **Invocation Name** field and type in **music assistant** and hit save
+3. Go to the **Code** tab and open the `index.js` file.
+4. Change the **API_HOSTNAME** and **MA_HOSTNAME** constants to point to your API and Music Assistant instance.
