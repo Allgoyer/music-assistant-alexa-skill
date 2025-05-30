@@ -32,4 +32,6 @@ For more details, see the [official documentation](https://developer.amazon.com/
 2. Click the **Invocation Name** field and type in **music assistant** and hit save
 3. Go to the **Code** tab and open the `index.js` file.
 4. Change the **API_HOSTNAME** and **MA_HOSTNAME** constants to point to your API and Music Assistant instance.
-5. Click **Deploy** to build and deploy the skill
+5. Click **Deploy** to deploy the skill
+6. Go to the **Test** and enable skill testing in **Development**
+7. Go to the **Build** tab and build the skill
