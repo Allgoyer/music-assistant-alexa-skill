@@ -9,6 +9,40 @@ const Alexa = require('ask-sdk-core');
 const AWS = require('aws-sdk');
 const ddbAdapter = require('ask-sdk-dynamodb-persistence-adapter');
 const Util = require('./util.js');
+const https = require('https');
+
+// Define global variables for hostnames
+const API_HOSTNAME = '<DEFINE-YOUR-API-HOSTNAME-HERE>'; // Replace with your API hostname
+const MA_HOSTNAME  = '<DEFINE-YOUR-MA-HOSTNAME-HERE>';  // Replace with your Music Assistant hostname
+
+function getLatestUrl() {
+    return new Promise((resolve, reject) => {
+        const options = {
+            hostname: API_HOSTNAME,
+            path: '/ma/latest-url',
+            method: 'GET'
+        };
+
+        const req = https.request(options, (res) => {
+            let data = '';
+            res.on('data', chunk => data += chunk);
+            res.on('end', () => {
+                try {
+                    const json = JSON.parse(data);
+                    resolve({ json: () => Promise.resolve(json) });
+                } catch (e) {
+                    reject(e);
+                }
+            });
+        });
+
+        req.on('error', (e) => {
+            reject(e);
+        });
+
+        req.end();
+    });
+}
 
 const LaunchRequestHandler = {
     canHandle(handlerInput) {
@@ -35,10 +69,14 @@ const PlayAudioIntentHandler = {
     },
     async handle(handlerInput) {
         const playbackInfo = await getPlaybackInfo(handlerInput);
+        
+        const apiResponse = await getLatestUrl();
+        const obj = await apiResponse.json();
+        const streamUrl = obj.streamUrl.replace(/^.*(?=\/flow\/)/, `https://${MA_HOSTNAME}`);
 
-        const speakOutput = 'Playing the audio stream.';
+        const speakOutput = '';
         const playBehavior = 'REPLACE_ALL';
-        const podcastUrl = 'https://audio1.maxi80.com';
+        const podcastUrl = streamUrl;
         
         /**
          * If your audio file is located on the S3 bucket in a hosted skill, you can use the line below to retrieve a presigned URL for the audio file.
@@ -194,9 +232,13 @@ const PlaybackControllerHandler = {
     return handlerInput.requestEnvelope.request.type.startsWith('PlaybackController.');
   },
   async handle(handlerInput) {
+    const apiResponse = await getLatestUrl();
+    const obj = await apiResponse.json();
+    const streamUrl = obj.streamUrl.replace(/^.*(?=\/flow\/)/, `https://${MA_HOSTNAME}`);
+
     const playbackInfo = await getPlaybackInfo(handlerInput);
     const playBehavior = 'REPLACE_ALL';
-    const podcastUrl = 'https://audio1.maxi80.com';
+    const podcastUrl = streamUrl;
     const playbackControllerEventName = handlerInput.requestEnvelope.request.type.split('.')[1];
     let response;
     switch (playbackControllerEventName) {
