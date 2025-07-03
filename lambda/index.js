@@ -29,7 +29,7 @@ function getLatestUrl() {
         const options = {
             hostname: API_HOSTNAME,
             path: '/ma/latest-url',
-            method: 'GET'
+            method: 'GET',
             headers: headers,
         };
 
