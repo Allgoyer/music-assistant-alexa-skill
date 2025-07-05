@@ -79,21 +79,43 @@ const PlayAudioIntentHandler = {
     },
     async handle(handlerInput) {
         const playbackInfo = await getPlaybackInfo(handlerInput);
-        
-        const apiResponse = await getLatestUrl();
-        const obj = await apiResponse.json();
-        const streamUrl = obj.streamUrl.replace(/^.*(?=\/flow\/)/, `https://${MA_HOSTNAME}`);
+
+        let apiResponse, obj, streamUrl, metadata;
+        try {
+            apiResponse = await getLatestUrl();
+            obj = await apiResponse.json();
+            streamUrl = obj.streamUrl.replace(/^.*(?=\/flow\/)/, `https://${MA_HOSTNAME}`);
+            metadata = {
+              title: obj.title,
+              subtitle: obj.title,
+              art: {
+                  sources: [
+                      {
+                          url: obj.imageUrl,
+                      }
+                  ]
+              },
+              backgroundImage: {
+                  sources: [
+                      {
+                          url: obj.imageUrl,
+                      }
+                  ]
+              }
+            };
+        } catch (error) {
+            console.error('Error fetching latest URL:', error);
+            const speakOutput = 'Sorry, I could not retrieve the latest music stream from the API. Please check your setup.';
+            return handlerInput.responseBuilder
+                .speak(speakOutput)
+                .getResponse();
+        }
 
         const speakOutput = '';
         const playBehavior = 'REPLACE_ALL';
         const podcastUrl = streamUrl;
         
         /**
-         * If your audio file is located on the S3 bucket in a hosted skill, you can use the line below to retrieve a presigned URL for the audio file.
-         * https://developer.amazon.com/docs/alexa/hosted-skills/alexa-hosted-skills-media-files.html
-         * 
-         * const podcastUrl = Util.getS3PreSignedUrl("Media/audio.mp3").replace(/&/g,'&amp;');
-         * 
          * If you cannot play your own audio in place of the sample URL, make sure your audio file adheres to the guidelines:
          * https://developer.amazon.com/docs/alexa/custom-skills/audioplayer-interface-reference.html#audio-stream-requirements
         */
@@ -242,9 +264,36 @@ const PlaybackControllerHandler = {
     return handlerInput.requestEnvelope.request.type.startsWith('PlaybackController.');
   },
   async handle(handlerInput) {
-    const apiResponse = await getLatestUrl();
-    const obj = await apiResponse.json();
-    const streamUrl = obj.streamUrl.replace(/^.*(?=\/flow\/)/, `https://${MA_HOSTNAME}`);
+    let apiResponse, obj, streamUrl, metadata;
+    try {
+        apiResponse = await getLatestUrl();
+        obj = await apiResponse.json();
+        streamUrl = obj.streamUrl.replace(/^.*(?=\/flow\/)/, `https://${MA_HOSTNAME}`);
+        metadata = {
+          title: obj.title,
+          subtitle: obj.title,
+          art: {
+              sources: [
+                  {
+                      url: obj.imageUrl,
+                  }
+              ]
+          },
+          backgroundImage: {
+              sources: [
+                  {
+                      url: obj.imageUrl,
+                  }
+              ]
+          }
+        };
+    } catch (error) {
+        console.error('Error fetching latest URL:', error);
+        const speakOutput = 'Sorry, I could not retrieve the latest music stream from the API. Please check your setup.';
+        return handlerInput.responseBuilder
+            .speak(speakOutput)
+            .getResponse();
+    }
 
     const playbackInfo = await getPlaybackInfo(handlerInput);
     const playBehavior = 'REPLACE_ALL';
@@ -258,7 +307,8 @@ const PlaybackControllerHandler = {
                 playBehavior,
                 podcastUrl,
                 playbackInfo.token,
-                playbackInfo.offsetInMilliseconds
+                playbackInfo.offsetInMilliseconds,
+                metadata
                 )
             .getResponse();
         break;
